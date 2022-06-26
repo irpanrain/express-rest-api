@@ -2,14 +2,21 @@
   const { v4: uuid } = require("uuid");
 
   const getAllContacts = () => {
-    const allContact = Contact.getAllContacts();
-
-    return allContact;
+    try {
+      const allContact = Contact.getAllContacts();
+      return allContact;
+    } catch (error) {
+      throw error;
+    }
   };
   
   const getOneContact = (contactId) => {
-    const contact = Contact.getOneContact(contactId);
-    return contact;
+    try {
+      const contact = Contact.getOneContact(contactId);
+      return contact;
+    } catch (error) {
+      throw(error);
+    }
   };
   
   const createNewContact = (newContact) => {
@@ -20,18 +27,29 @@
         createdAt: new Date().toLocaleString("en-US", { timeZone: "UTC" }),
         updatedAt: new Date().toLocaleString("en-US", { timeZone: "UTC" }),
     };
-    
-    const createdContact = Contact.createNewContact(contactToInsert);
-    return createdContact;
+    try {
+      const createdContact = Contact.createNewContact(contactToInsert);
+      return createdContact;
+    } catch (error) {
+      throw error;
+    }
   };
   
   const updateOneContact = (contactId, updateContact) => {
-    const updatedContact = Contact.updateOneContact(contactId, updateContact);
-    return updatedContact;
+    try {
+      const updatedContact = Contact.updateOneContact(contactId, updateContact);
+      return updatedContact;
+    } catch (error) {
+      throw error;
+    }
   };
   
   const deleteOneContact = (contactId) => {
-    return Contact.deleteOneContact(contactId);
+    try {
+      return Contact.deleteOneContact(contactId);
+    } catch (error) {
+      throw error;
+    }
   };
   
   module.exports = {

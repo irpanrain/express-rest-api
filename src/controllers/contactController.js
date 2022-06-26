@@ -1,8 +1,15 @@
 const contactService = require("../services/contactService");
 
 const getAllContacts = (req, res) => {
-    const allContacts = contactService.getAllContacts();
-    res.send({status: "OK", data: allContacts});
+    try {
+      const allContacts = contactService.getAllContacts();
+      res.send({status: "OK", data: allContacts});  
+    } catch (error) {
+      res
+      .status(error.message ? error.message : 500)
+      .send({status: "FAILED", data: {error: error.message ? error.message : error}});
+    }
+    
 };
 
 const getOneContact = (req, res) => {
@@ -10,10 +17,26 @@ const getOneContact = (req, res) => {
       params: { contactId },
     } = req;
     if(!contactId) {
+      res
+      .status(400)
+      .send({
+        status: "FAILED",
+        data: {error: "Parameter ':contactId' can not be empty"},
+      })
       return;
     }
-    const contact = contactService.getOneContact(contactId);
-    res.send({status: "OK", data: contact});
+
+    try {
+      const contact = contactService.getOneContact(contactId);
+      res.send({status: "OK", data: contact}); 
+    } catch (error) {
+      res
+      .status({error : error ? 500 : error})
+      .send({
+        status: "FAILED",
+        data: {error: error.message ? error.message : error},
+      });
+    }
 };
 
 const createNewContact = (req, res) => {
@@ -23,7 +46,14 @@ const createNewContact = (req, res) => {
     !body.phone ||
     !body.email
   ) {
-    return;
+    res
+    .status(400)
+    .send({
+      status: "FAILED",
+      data: { 
+        error: "One of following keys is missing or is empty in request body: 'name', 'phoen', 'email'",
+      },
+    });
   }
 
   const newContact = {
@@ -32,9 +62,14 @@ const createNewContact = (req, res) => {
     email: body.email
   };
   
-  const createdContact = contactService.createNewContact(newContact);
-  
-  res.status(201).send({ status: "OK", data: createdContact });
+  try {
+    const createdContact = contactService.createNewContact(newContact);
+    res.status(201).send({ status: "OK", data: createdContact });
+  } catch (error) {
+    res
+    .status(error.status ? error.status : 500)
+    .send({status: "FAILED", data: { error: error.message ? error.message : error } });
+  }
 };
 
 const updateOneContact = (req, res) => {
@@ -43,11 +78,22 @@ const updateOneContact = (req, res) => {
     params: {contactId},
   } = req;
   if(!contactId) {
-    return;
+    res
+    .status(400)
+    .send({
+      status: "FAILED",
+      data: { error: "Parameter ':contactId' can't be empty"},
+    });
   }
 
-  const updateContact = contactService.updateOneContact(contactId, body);
-  res.send({status: "OK", data: updateContact});
+  try {
+    const updateContact = contactService.updateOneContact(contactId, body);
+    res.send({status: "OK", data: updateContact}); 
+  } catch (error) {
+    res
+    .status(error.message ? 500 : error)
+    .send({status: "FAILED", data: {error: error.message ? error.message : message} })
+  }
 };
 
 const deleteOneContact = (req, res) => {
@@ -56,11 +102,22 @@ const deleteOneContact = (req, res) => {
   } = req;
 
   if(!contactId) {
-    return;
+      res.
+      status(400)
+      .send({
+        status: "FAILED",
+        data: { error: "Parameter ':contactId' can't not be empty"},
+      })
   }
 
-  const deleteContact = contactService.deleteOneContact(contactId);
-  res.status(204).send({status: "OK"});
+  try {
+    const deleteContact = contactService.deleteOneContact(contactId);
+    res.status(204).send({status: "OK"});
+  } catch (error) {
+    res
+    .status(error.status ? error.status : 500)
+    .send({ status: "FAILED", data: {error: error.message? error.message : error}});
+  }
 };
 
 module.exports = {

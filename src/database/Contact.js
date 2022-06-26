@@ -2,54 +2,92 @@ const DB = require("./db.json");
 const { saveToDatabase } = require("./utils");
 
 const getAllContacts = () => {
-  return DB.contacts;
+    try {
+        return DB.contacts;
+    } catch (error) {
+        throw { status: 500, message: error };
+    }
 };
 
 const getOneContact = (contactId) => {
-    const contact = DB.contacts.find((contact) => contact.id === contactId);
-    if (!contact) {
-        return;
+    try {
+        const contact = DB.contacts.find((contact) => contact.id === contactId);
+        if (!contact) {
+            throw {
+                status: 400,
+                message: `Can't find contact with the id '${contactId}'`
+            }
+        }
+        return contact;
+    } catch (error) {
+        throw { status: 500, message: error.message ? error.message : error};
     }
-    return contact;
 }
 
 const createNewContact = (newContact) => {
     const isAlreadyAdded =
-        DB.contacts.findIndex((workout) => workout.name === newContact.name) > -1;
+        DB.contacts.findIndex((contact) => contact.name === newContact.name) > -1;
     if (isAlreadyAdded) {
-        return;
+        throw {
+            status: 400,
+            message: `Contact with the name '${newContact.name}' already exist`
+        }
     }
-    DB.contacts.push(newContact);
-    saveToDatabase(DB);
-    return newContact;
+
+    try {
+        DB.contacts.push(newContact);
+        saveToDatabase(DB);
+        return newContact;   
+    } catch (error) {
+        throw { status: error.status ? error.status : 500, message: error.message ? error.message : error };
+    }
 };
 
 const updateOneContact = (contactId, updateContact) => {
-    const indexForUpdate = DB.contacts.findIndex((contact) => contact.id === contactId);
-    if (indexForUpdate === -1) {
-        return;
+    try {
+        const indexForUpdate = DB.contacts.findIndex((contact) => contact.id === contactId);
+        if (indexForUpdate === -1) {
+            throw {
+                status: 400,
+                message: `Can't find contact with the id ${contactId}`,
+            }
+        }
+        const isAlreadyAdded = DB.contacts.findIndex((contact) => contact.name === updateContact.name > -1);
+        if(isAlreadyAdded) {
+            throw {
+                status: 400,
+                message: `Contact with the name '${updateContact.name}' already exist`,
+            };
+        }
+
+        const updatedContact = {
+            ...DB.contacts[indexForUpdate],
+            ...updateContact,
+            updatedAt: new Date().toLocaleString("en-US", { timeZone: "UTC"}),
+        };
+
+        DB.contacts[indexForUpdate] = updatedContact;
+        saveToDatabase(DB);
+        return updatedContact;
+    } catch (error) {
+        throw { status: 500, message: error.message ? error.message : error};
     }
-
-    const updatedContact = {
-        ...DB.contacts[indexForUpdate],
-        ...updateContact,
-        updatedAt: new Date().toLocaleString("en-US", { timeZone: "UTC"}),
-    };
-
-    DB.contacts[indexForUpdate] = updatedContact;
-    saveToDatabase(DB);
-    return updatedContact;
 }
 
 const deleteOneContact = (contactId) => {
-    const indexForDelete = DB.contacts.findIndex((contact) => contact.id === contactId);
-
-    if (indexForDelete === -1) {
-        return;
+    try {
+        const indexForDelete = DB.contacts.findIndex((contact) => contact.id === contactId);
+        if (indexForDelete === -1) {
+            throw {
+                status: 400,
+                message: `Can't find contact with the id : '${contactId}'`,            }
+        }
+    
+        DB.contacts.splice(indexForDelete, 1);
+        saveToDatabase(DB);   
+    } catch (error) {
+        throw { status: error.status || 500, messsage: error.status ? error.status : 500 };
     }
-
-    DB.contacts.splice(indexForDelete, 1);
-    saveToDatabase(DB);
 }
 
 
