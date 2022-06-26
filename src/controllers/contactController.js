@@ -6,8 +6,14 @@ const getAllContacts = (req, res) => {
 };
 
 const getOneContact = (req, res) => {
-    const contact = contactService.getOneContact();
-    res.send("Get an existing contact");
+    const {
+      params: { contactId },
+    } = req;
+    if(!contactId) {
+      return;
+    }
+    const contact = contactService.getOneContact(contactId);
+    res.send({status: "OK", data: contact});
 };
 
 const createNewContact = (req, res) => {
@@ -32,13 +38,29 @@ const createNewContact = (req, res) => {
 };
 
 const updateOneContact = (req, res) => {
-    const updateContact = contactService.updateOneContact();
-    res.send("Update an existing contact");
+  const {
+    body,
+    params: {contactId},
+  } = req;
+  if(!contactId) {
+    return;
+  }
+
+  const updateContact = contactService.updateOneContact(contactId, body);
+  res.send({status: "OK", data: updateContact});
 };
 
 const deleteOneContact = (req, res) => {
-    const deleteContact = contactService.deleteOneContact();
-    res.send("Delete an existing contact");
+  const {
+    params: {contactId},
+  } = req;
+
+  if(!contactId) {
+    return;
+  }
+
+  const deleteContact = contactService.deleteOneContact(contactId);
+  res.status(204).send({status: "OK"});
 };
 
 module.exports = {

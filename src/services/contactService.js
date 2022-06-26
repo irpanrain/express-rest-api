@@ -7,15 +7,16 @@
     return allContact;
   };
   
-  const getOneContact = () => {
-    return;
+  const getOneContact = (contactId) => {
+    const contact = Contact.getOneContact(contactId);
+    return contact;
   };
   
   const createNewContact = (newContact) => {
     
     const contactToInsert = {
-        ...newContact,
         id: uuid(),
+        ...newContact,
         createdAt: new Date().toLocaleString("en-US", { timeZone: "UTC" }),
         updatedAt: new Date().toLocaleString("en-US", { timeZone: "UTC" }),
     };
@@ -24,12 +25,13 @@
     return createdContact;
   };
   
-  const updateOneContact = () => {
-    return;
+  const updateOneContact = (contactId, updateContact) => {
+    const updatedContact = Contact.updateOneContact(contactId, updateContact);
+    return updatedContact;
   };
   
-  const deleteOneContact = () => {
-    return;
+  const deleteOneContact = (contactId) => {
+    return Contact.deleteOneContact(contactId);
   };
   
   module.exports = {
